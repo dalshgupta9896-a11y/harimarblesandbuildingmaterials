@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050a2e">
+<meta name="description" content="A magical Happy Diwali celebration from the Gupta Family.">
+<title>Happy Diwali – Gupta Family</title>
+<style>
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+:root{
+  --gold:#ffd25a;--gold2:#ffb020;--cream:#fff3d6;--navy:#050a2e;
+  --serif:"Cinzel","Trajan Pro","Optima","Palatino Linotype","Book Antiqua",Palatino,Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html,body{margin:0;background:#02041a;color:var(--cream);font-family:var(--sans)}
+body{overflow-x:hidden;min-height:100svh}
+button{font:inherit;-webkit-tap-highlight-color:transparent}
+h1,h2,h3,p{margin:0}
+
+/* ---------- backdrop layers ---------- */
+#sky{position:fixed;inset:0;z-index:0;background:
+  radial-gradient(ellipse at 50% 108%,rgba(255,120,30,.34),transparent 55%),
+  radial-gradient(ellipse at 15% 18%,rgba(120,60,200,.28),transparent 50%),
+  radial-gradient(ellipse at 85% 32%,rgba(40,80,200,.22),transparent 55%),
+  linear-gradient(180deg,#02041a 0%,#070d3e 40%,#1a1052 72%,#34145f 100%)}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#ambient{z-index:1}
+#fx{z-index:2}
+#lightWash{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transform:scale(.1);
+  background:radial-gradient(circle at 50% 50%,rgba(255,196,90,.5) 0%,rgba(255,140,40,.26) 28%,rgba(120,50,160,.12) 55%,transparent 76%);
+  transition:opacity 2.6s ease,transform 3.4s cubic-bezier(.2,.7,.2,1)}
+body.i-light #lightWash{opacity:1;transform:scale(1.5)}
+body.away #lightWash{opacity:.3}
+body.magic #lightWash{animation:washPulse 2.4s ease-out}
+#lanterns{position:fixed;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+.content{position:relative;z-index:5}
+
+/* ---------- start overlay ---------- */
+#start{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;
+  background:rgba(2,4,26,.58);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  transition:opacity 1.1s ease,visibility 1.1s}
+body.started #start{opacity:0;visibility:hidden;pointer-events:none}
+.startInner{text-align:center;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.startInner h2{font-family:var(--serif);font-size:clamp(1.5rem,6vw,2.4rem);color:var(--gold);letter-spacing:.08em;text-shadow:0 0 18px rgba(255,170,40,.55)}
+.startInner p{color:#ffe9c0;line-height:1.6;font-size:clamp(.95rem,3.4vw,1.1rem);margin-bottom:6px}
+.startInner .btn{width:min(340px,100%)}
+
+/* ---------- buttons ---------- */
+.btn{position:relative;overflow:hidden;font-weight:800;font-size:clamp(.74rem,1.9vw,.9rem);letter-spacing:.12em;
+  min-height:46px;padding:.95em 1.4em;border:0;border-radius:999px;cursor:pointer;color:#2b1100;
+  background:linear-gradient(180deg,#ffe48a,#ffb020 60%,#e9780c);
+  box-shadow:0 0 0 1px rgba(255,255,255,.35) inset,0 6px 20px rgba(255,150,30,.35),0 0 24px rgba(255,190,70,.25);
+  transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
+.btn::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:shine 4.6s ease-in-out infinite}
+.btn:hover{transform:translateY(-2px) scale(1.03);filter:brightness(1.08)}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible,.ctl:focus-visible,.envelope:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.btn.fire{background:linear-gradient(180deg,#ff9d5c,#ff4d2e 55%,#c71f4a);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.3) inset,0 6px 20px rgba(255,70,60,.4),0 0 24px rgba(255,90,60,.3)}
+.btn.violet{background:linear-gradient(180deg,#a46cf5,#6a2bc0 60%,#3d1590);color:#fff3d6;box-shadow:0 0 0 1px rgba(255,210,90,.55) inset,0 6px 20px rgba(130,70,230,.45),0 0 24px rgba(160,100,255,.3)}
+.btn.glass{background:rgba(255,255,255,.09);color:#ffe9a8;box-shadow:0 0 0 1px rgba(255,210,90,.65) inset,0 6px 20px rgba(0,0,0,.35)}
+.btn:nth-child(2)::after{animation-delay:.9s}.btn:nth-child(3)::after{animation-delay:1.8s}.btn:nth-child(4)::after{animation-delay:2.7s}.btn:nth-child(5)::after{animation-delay:3.6s}
+
+#controls{position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));z-index:40;display:flex;gap:8px;
+  opacity:0;pointer-events:none;transition:opacity 1s ease}
+body.started #controls{opacity:1;pointer-events:auto}
+.ctl{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,210,90,.6);background:rgba(10,8,45,.6);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#ffe9a8;font-size:1.05rem;line-height:1;cursor:pointer;
+  display:grid;place-items:center;transition:transform .2s,background .2s,opacity .2s}
+.ctl:hover{transform:scale(1.1);background:rgba(60,30,120,.7)}
+.ctl.off{opacity:.5;filter:grayscale(1)}
+
+/* ---------- hero ---------- */
+#hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;
+  padding:clamp(64px,9vh,100px) 16px clamp(150px,34vh,300px)}
+.heroContent{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%}
+#title{display:flex;flex-wrap:wrap;justify-content:center;gap:0 .34em;font-family:var(--serif);font-weight:900;
+  font-size:clamp(2.6rem,10.5vw,7rem);letter-spacing:.06em;line-height:1.08;perspective:700px;
+  filter:drop-shadow(0 0 16px rgba(255,170,40,.6)) drop-shadow(0 3px 0 rgba(120,50,0,.4))}
+#title .w{display:inline-block;white-space:nowrap}
+#title .l{display:inline-block;opacity:0;transform:translateY(46px) scale(.5) rotateX(70deg);
+  background:linear-gradient(180deg,#fff6c9 0%,#ffd45a 38%,#ff9b1a 74%,#c2570a 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+  transition:opacity .9s ease,transform 1.1s cubic-bezier(.2,1.2,.3,1);transition-delay:calc(var(--i)*85ms)}
+body.i-title #title .l{opacity:1;transform:none}
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){#title .l{color:#ffd45a;-webkit-text-fill-color:#ffd45a}}
+#subtitle{margin-top:.7rem;font-family:var(--serif);letter-spacing:.26em;text-transform:uppercase;font-size:clamp(.78rem,2.4vw,1.2rem);
+  color:#ffe9a8;text-shadow:0 0 12px rgba(255,180,60,.6)}
+#subtitle,#buttons,#cue{opacity:0;transform:translateY(20px);pointer-events:none;transition:opacity 1.2s ease,transform 1.2s ease}
+body.i-ui #subtitle,body.i-ui #buttons,body.i-ui #cue{opacity:1;transform:none}
+body.i-ui #buttons{pointer-events:auto}
+#mainDiya{--w:clamp(130px,24vmin,230px);--gl:-120%;margin-top:clamp(10px,2.5vh,26px);opacity:0;transform:scale(.8);
+  transition:opacity 1.5s ease,transform 1.5s ease}
+body.i-diya #mainDiya{opacity:1;transform:none}
+#buttons{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:1000px;margin-top:clamp(18px,4vh,34px)}
+#cue{margin-top:clamp(12px,2.4vh,22px);font-size:.78rem;letter-spacing:.3em;color:#ffe0a0;text-transform:uppercase}
+#cue span{display:inline-block;animation:hint 1.8s ease-in-out infinite}
+
+.palace,.rangoli,#garland,.diyaRow{opacity:0;transition:opacity 2.4s ease}
+body.i-light .palace.near,body.i-light .rangoli,body.i-light #garland,body.i-light .diyaRow{opacity:1}
+body.i-light .palace.far{opacity:.8}
+.palace{position:absolute;left:-3%;right:-3%;bottom:0;height:clamp(130px,34vh,340px);pointer-events:none;will-change:transform;z-index:3}
+.palace svg{width:100%;height:100%;display:block}
+.palace.far{bottom:clamp(8px,2.2vh,26px)}
+.palace.near{filter:drop-shadow(0 -4px 16px rgba(255,140,40,.3));background:linear-gradient(to top,#06031a 0,#06031a 17%,transparent 17%)}
+.wins path,.wins rect,.gate{animation:winFlicker 3.4s ease-in-out infinite}
+.rangoli{position:absolute;left:50%;bottom:-2%;width:clamp(220px,36vw,400px);transform:translateX(-50%);z-index:4;pointer-events:none;perspective:700px}
+.rangoli .rtilt{transform:rotateX(62deg)}
+.rangoli svg{display:block;width:100%;animation:spin 80s linear infinite}
+.rangoli.side{width:clamp(120px,17vw,230px);bottom:0}
+.rangoli.side.l{left:12%}.rangoli.side.r{left:88%}
+.diyaRow{position:absolute;left:0;right:0;bottom:clamp(2px,1.2vh,14px);display:flex;justify-content:space-around;padding:0 3vw;z-index:4;pointer-events:none}
+.diyaRow .diyaWrap{--w:clamp(44px,7vw,84px);--gl:-70%}
+#garland{position:absolute;top:0;left:0;right:0;height:78px;z-index:4;pointer-events:none;overflow:hidden}
+#garland svg{position:absolute;left:0;top:0}
+.bulb{position:absolute;width:9px;height:12px;border-radius:50% 50% 55% 55%;background:var(--c);box-shadow:0 0 9px 2px var(--c);
+  transform:translate(-50%,0);animation:twinkle 1.7s ease-in-out infinite;animation-delay:var(--d)}
+
+/* ---------- diyas ---------- */
+.diyaWrap{position:relative;display:block;width:var(--w,100px);aspect-ratio:200/150;flex:none}
+.diyaWrap::before{content:"";position:absolute;inset:var(--gl,-80%);border-radius:50%;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at 50% 38%,rgba(255,190,80,.55),rgba(255,120,20,.2) 35%,transparent 62%);
+  transition:opacity 1.4s ease;animation:glowPulse 2.4s ease-in-out infinite}
+.diyaWrap.lit::before{opacity:1}
+.diyaWrap svg{position:relative;width:100%;height:100%;display:block;overflow:visible}
+.flameWrap{transform-box:view-box;transform-origin:100px 64px;transform:scale(0);opacity:0;transition:transform 1s cubic-bezier(.2,1.3,.4,1),opacity .6s}
+.lit .flameWrap{transform:none;opacity:1}
+.flame{transform-box:view-box;transform-origin:100px 64px;animation:flicker 1s ease-in-out infinite}
+.diyaWrap.flare svg{animation:flareSvg 1.5s ease-out}
+
+/* ---------- lanterns ---------- */
+.lantern{position:absolute;left:var(--x);bottom:-110px;width:var(--s);height:calc(var(--s)*1.25);opacity:.9;will-change:transform;
+  animation:rise var(--dur) linear var(--del) infinite}
+.lantern.once{animation-iteration-count:1;animation-delay:0s;animation-fill-mode:forwards}
+.lantern i{position:absolute;inset:8% 0;border-radius:45% 45% 40% 40%/55% 55% 45% 45%;
+  background:radial-gradient(ellipse at 50% 65%,#fff3b0 0,#ffb340 35%,hsl(var(--hue),90%,45%) 75%,hsl(var(--hue),80%,28%) 100%);
+  box-shadow:0 0 calc(var(--s)*.9) calc(var(--s)*.15) rgba(255,160,50,.5)}
+.lantern::before,.lantern::after{content:"";position:absolute;left:20%;right:20%;height:9%;background:#7a3a0c;border-radius:3px}
+.lantern::before{top:0}.lantern::after{bottom:0}
+
+/* ---------- wish ---------- */
+#wish{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,3.5vh,32px);
+  padding:clamp(40px,8vh,90px) 16px;text-align:center}
+.secTitle{font-family:var(--serif);font-size:clamp(1.1rem,3.6vw,1.8rem);letter-spacing:.14em;color:var(--gold);text-shadow:0 0 16px rgba(255,170,40,.5)}
+#wishWrap{display:grid;place-items:center;width:100%;perspective:1100px}
+.envelope{grid-area:1/1;position:relative;display:block;width:min(78vw,340px);aspect-ratio:1.5;border:0;padding:0;cursor:pointer;border-radius:10px;
+  background:linear-gradient(145deg,#ffcf5a,#e08a12);box-shadow:0 20px 50px rgba(0,0,0,.5),0 0 44px rgba(255,170,40,.4);
+  transition:opacity .8s ease,transform .9s ease;animation:bob 3s ease-in-out infinite}
+.envelope::before{content:"";position:absolute;inset:0;border-radius:10px;
+  background:linear-gradient(to bottom right,transparent 49.4%,rgba(120,50,0,.28) 50%),linear-gradient(to bottom left,transparent 49.4%,rgba(120,50,0,.28) 50%);
+  clip-path:polygon(0 45%,50% 100%,100% 45%,100% 100%,0 100%)}
+.envelope .flap{position:absolute;left:0;right:0;top:0;height:56%;background:linear-gradient(180deg,#ffe08a,#f2a41c);
+  clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .8s ease}
+.envelope .seal{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:1.6rem;
+  background:radial-gradient(circle at 35% 30%,#ff6b6b,#a50e2a);box-shadow:0 4px 10px rgba(0,0,0,.4)}
+.envelope .hint{position:absolute;left:0;right:0;bottom:-36px;text-align:center;color:#ffe9a8;letter-spacing:.2em;font-size:.78rem;text-transform:uppercase;font-weight:700}
+#wishWrap.open .envelope{opacity:0;transform:translateY(60px) scale(.8) rotateX(40deg);pointer-events:none;animation:none}
+#wishWrap.open .envelope .flap{transform:rotateX(180deg)}
+.card{grid-area:1/1;position:relative;width:min(92vw,660px);padding:clamp(26px,5vw,52px) clamp(20px,5vw,48px);border-radius:22px;text-align:center;
+  background:linear-gradient(160deg,rgba(40,18,98,.92),rgba(18,10,62,.94));color:var(--cream);
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 60px rgba(255,170,40,.22),inset 0 0 40px rgba(255,200,90,.08);
+  opacity:0;visibility:hidden;transform:translateY(40px) scale(.9) rotateX(-18deg);
+  transition:opacity .9s ease .5s,transform 1.1s cubic-bezier(.2,.8,.2,1) .5s,visibility 0s linear .5s}
+.card::before{content:"";position:absolute;inset:-2px;border-radius:24px;padding:2px;pointer-events:none;
+  background:conic-gradient(from var(--a),#ffd25a,#ff7a1a,#b66bff,#ffd25a);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:borderSpin 6s linear infinite}
+#wishWrap.open .card{opacity:1;visibility:visible;transform:none}
+.card .corner{position:absolute;color:var(--gold);font-size:1.2rem;opacity:.8}
+.card .tl{top:10px;left:14px}.card .tr{top:10px;right:14px}.card .bl{bottom:10px;left:14px}.card .br{bottom:10px;right:14px}
+.cardDiya{--w:64px;--gl:-90%;margin:-22px auto 8px}
+.ln{opacity:0;transform:translateY(14px);font-family:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+  font-size:clamp(1rem,2.5vw,1.2rem);line-height:1.75;margin:0 0 1em;transition:opacity .9s ease,transform .9s ease}
+#wishWrap.open .ln{opacity:1;transform:none;transition-delay:calc(var(--n)*.75s + 1.1s)}
+.ln.salute{font-family:var(--serif);color:var(--gold);font-size:clamp(1.25rem,4vw,1.8rem);font-weight:700}
+.ln.hl{color:#ffe07a;font-weight:700;font-size:clamp(1.1rem,2.9vw,1.4rem)}
+.ln.sign{font-style:italic;color:#ffd0d8;margin:1.2em 0 0}
+
+/* ---------- family ---------- */
+#family{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:clamp(48px,8vh,90px) clamp(14px,4vw,40px)}
+#family>.scrim{position:absolute;inset:4% 0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(4,4,28,.66) 0%,rgba(4,4,28,.42) 46%,transparent 74%)}
+#family>*:not(.scrim){position:relative;z-index:1}
+#famHeading{font-family:var(--serif);font-size:clamp(1rem,3.4vw,1.9rem);letter-spacing:.18em;color:#ffe9a8;text-wrap:balance;
+  text-shadow:0 0 16px rgba(255,170,40,.55);opacity:0;transform:translateY(-14px);transition:opacity 1.2s ease,transform 1.2s ease}
+#famHeading.show{opacity:1;transform:none}
+.names{width:min(100%,1000px);display:flex;flex-direction:column;gap:clamp(8px,1.8vh,18px);margin:clamp(16px,3.5vh,36px) 0}
+.nameRow{width:100%;opacity:0;transform:translateY(26px) scale(.94);transition:opacity 1s ease,transform 1.1s cubic-bezier(.2,.9,.25,1)}
+.nameRow.show{opacity:1;transform:none}
+.fname{width:100%;text-align:center;white-space:nowrap;font-family:var(--serif);font-weight:800;
+  font-size:clamp(1.35rem,min(7.4vw,9.2vh),4.2rem);letter-spacing:.06em;padding:0 .04em 0 .1em;line-height:1.15;
+  color:#ffd978;text-shadow:0 1px 0 #b8741a,0 0 14px rgba(255,190,60,.5),0 0 34px rgba(255,120,0,.22)}
+.nameRow.active .fname{animation:namePulse 2.4s ease-in-out infinite}
+.rule{display:block;height:2px;width:0;margin:4px auto 0;background:linear-gradient(90deg,transparent,#ffd25a,transparent);transition:width 1.3s ease .3s}
+.nameRow.show .rule{width:min(62%,440px)}
+#signature{opacity:0;transform:translateY(20px) scale(.96);transition:opacity 1.5s ease,transform 1.5s ease}
+#signature.show{opacity:1;transform:none}
+.sigText{font-family:var(--serif);font-weight:800;font-size:clamp(1.2rem,4vw,2.9rem);letter-spacing:.08em;line-height:1.25;text-wrap:balance;color:#ffe07a;
+  text-shadow:0 1px 0 #b8741a,0 0 16px rgba(255,190,60,.6),0 0 40px rgba(255,120,0,.3)}
+.sigDiyas,.creditDiyas{display:flex;gap:clamp(8px,2vw,22px);justify-content:center;margin-top:clamp(14px,2.6vh,26px)}
+.sigDiyas .diyaWrap{--w:clamp(40px,8vw,72px);--gl:-80%}
+
+/* ---------- credit ---------- */
+#credit{min-height:62svh;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;
+  padding:clamp(30px,6vh,60px) 16px calc(clamp(34px,8vh,80px) + env(safe-area-inset-bottom))}
+.creditDiyas .diyaWrap{--w:clamp(34px,6vw,54px);--gl:-80%}
+#creditText{margin-top:clamp(18px,3.4vh,34px);font-family:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;font-style:italic;font-weight:700;
+  font-size:clamp(1.25rem,4.8vw,2.7rem);color:#ffe9a8;line-height:1.35;text-wrap:balance;max-width:100%}
+#creditText .w{display:inline-block;white-space:nowrap}
+#creditText .l{display:inline-block;opacity:0;transform:translateY(30px) rotate(6deg);
+  transition:opacity .7s ease,transform .8s cubic-bezier(.2,1.2,.3,1);transition-delay:calc(var(--i)*55ms)}
+#credit.show #creditText .l{opacity:1;transform:none}
+#creditText .heart{display:inline-block;opacity:0;transition:opacity 1s ease 1.6s;font-style:normal}
+#credit.show #creditText .heart{opacity:1;animation:beat 1.2s ease-in-out 2.6s infinite}
+#credit.show #creditText{animation:glowText 3s ease-in-out 1.8s infinite}
+.creditLine{display:block;height:2px;width:0;margin:14px auto 0;background:linear-gradient(90deg,transparent,#ffd25a,transparent);transition:width 1.6s ease .5s}
+#credit.show .creditLine{width:min(70%,460px)}
+
+/* ---------- keyframes ---------- */
+@keyframes flicker{0%,100%{transform:scale(1,1) skewX(0)}20%{transform:scale(.95,1.07) skewX(-2.5deg)}40%{transform:scale(1.05,.95) skewX(2deg)}60%{transform:scale(.97,1.09) skewX(-1deg)}80%{transform:scale(1.03,.98) skewX(1.6deg)}}
+@keyframes glowPulse{0%,100%{transform:scale(.92)}50%{transform:scale(1.07)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rise{0%{transform:translate3d(0,0,0) rotate(-3deg)}50%{transform:translate3d(var(--sway),-60vh,0) rotate(3deg)}100%{transform:translate3d(calc(var(--sway)*-1),-130vh,0) rotate(-3deg)}}
+@keyframes twinkle{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shine{0%,60%{left:-60%}100%{left:130%}}
+@keyframes borderSpin{to{--a:360deg}}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.28)}}
+@keyframes winFlicker{0%,100%{opacity:.95}45%{opacity:.6}60%{opacity:1}80%{opacity:.75}}
+@keyframes flareSvg{0%{filter:brightness(1)}35%{filter:brightness(1.6) drop-shadow(0 0 18px rgba(255,200,80,.9))}100%{filter:brightness(1)}}
+@keyframes washPulse{0%{filter:brightness(1)}30%{filter:brightness(1.9) saturate(1.3)}100%{filter:brightness(1)}}
+@keyframes namePulse{0%,100%{text-shadow:0 1px 0 #b8741a,0 0 14px rgba(255,190,60,.5),0 0 34px rgba(255,120,0,.22)}50%{text-shadow:0 1px 0 #b8741a,0 0 20px rgba(255,200,80,.75),0 0 50px rgba(255,130,0,.38)}}
+@keyframes glowText{0%,100%{text-shadow:0 0 10px rgba(255,190,60,.45)}50%{text-shadow:0 0 22px rgba(255,200,80,.85),0 0 46px rgba(255,130,0,.35)}}
+@keyframes hint{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+body.paused *,body.paused *::before,body.paused *::after{animation-play-state:paused!important}
+
+/* ---------- small screens ---------- */
+@media (max-width:700px){
+  .rangoli.side{display:none}
+  .diyaRow .diyaWrap:nth-child(n+6){display:none}
+}
+@media (max-width:560px){
+  #buttons{flex-direction:column;align-items:stretch;width:min(330px,100%)}
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+  .flame,.diyaWrap::before,.bulb,.btn::after,.envelope,.rangoli svg,.card::before{animation:none!important}
+  .nameRow,#signature,#famHeading{transform:none!important}
+  .lantern{animation:none!important;bottom:auto;top:var(--ty)}
+  .diyaWrap::before{opacity:1}
+}
+</style>
+</head>
+<body>
+<noscript><p style="position:relative;z-index:99;padding:30px;text-align:center;color:#ffd25a">Please enable JavaScript to see this Diwali celebration. 🪔</p></noscript>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="gBowl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7a640"/><stop offset=".55" stop-color="#cc5a1c"/><stop offset="1" stop-color="#7c2a0c"/></linearGradient>
+  <linearGradient id="gOil" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff9a1a"/><stop offset=".5" stop-color="#ffd25a"/><stop offset="1" stop-color="#ff9a1a"/></linearGradient>
+  <linearGradient id="gFlame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a00"/><stop offset=".5" stop-color="#ff9d1a"/><stop offset="1" stop-color="#ffe27a"/></linearGradient>
+  <linearGradient id="gCore" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5aa8ff"/><stop offset=".25" stop-color="#fff2b0"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+</defs></svg>
+
+<div id="sky"></div>
+<div id="lightWash"></div>
+<canvas id="ambient"></canvas>
+<canvas id="fx"></canvas>
+<div id="lanterns" aria-hidden="true"></div>
+
+<div id="start" role="dialog" aria-label="Start the Diwali celebration">
+  <div class="startInner">
+    <h2>✨ A Little Magic For You ✨</h2>
+    <p>A festival of lights, wishes and fireworks — made with love for family &amp; friends.</p>
+    <button id="beginSound" class="btn" type="button">🪔 LIGHT THE DIYA (WITH MUSIC)</button>
+    <button id="beginSilent" class="btn glass" type="button">BEGIN WITHOUT SOUND</button>
+  </div>
+</div>
+
+<div id="controls">
+  <button id="ctlSound" class="ctl" type="button" aria-label="Sound on or off" title="Sound on/off">🔇</button>
+  <button id="ctlMusic" class="ctl" type="button" aria-label="Music on or off" title="Music on/off">🎵</button>
+  <button id="ctlSfx" class="ctl" type="button" aria-label="Firework sound effects on or off" title="Firework sounds on/off">🎆</button>
+  <button id="ctlPause" class="ctl" type="button" aria-label="Pause animations" title="Pause / resume animations">⏸</button>
+</div>
+
+<main>
+  <section id="hero" aria-label="Happy Diwali">
+    <div id="garland" aria-hidden="true"></div>
+    <div class="heroContent content">
+      <h1 id="title" aria-label="Happy Diwali">HAPPY DIWALI</h1>
+      <p id="subtitle">✨ शुभ दीपावली · Festival of Lights ✨</p>
+      <div id="mainDiya" class="diyaWrap" data-diya></div>
+      <nav id="buttons" aria-label="Celebration buttons">
+        <button id="btnMagic" class="btn" type="button">✨ RELEASE THE MAGIC</button>
+        <button id="btnFire" class="btn fire" type="button">🎆 FIREWORKS EXPLOSION</button>
+        <button id="btnWish" class="btn violet" type="button">💌 OPEN YOUR SPECIAL WISH</button>
+        <button id="btnSound" class="btn glass" type="button" aria-pressed="false">🔇 SOUND OFF</button>
+        <button id="btnAgain" class="btn" type="button">🎇 CELEBRATE AGAIN</button>
+      </nav>
+      <p id="cue"><span>▼ scroll for your wish ▼</span></p>
+    </div>
+    <div class="palace far" id="palaceFar" aria-hidden="true"></div>
+    <div class="palace near" id="palaceNear" aria-hidden="true"></div>
+    <div class="rangoli side l" aria-hidden="true"><div class="rtilt"><svg viewBox="0 0 400 400"></svg></div></div>
+    <div class="rangoli side r" aria-hidden="true"><div class="rtilt"><svg viewBox="0 0 400 400"></svg></div></div>
+    <div class="rangoli" aria-hidden="true"><div class="rtilt"><svg viewBox="0 0 400 400"></svg></div></div>
+    <div class="diyaRow" id="diyaRow" aria-hidden="true"></div>
+  </section>
+
+  <section id="wish" class="content" aria-label="Your special wish">
+    <h2 class="secTitle">💌 A Special Wish For You</h2>
+    <div id="wishWrap">
+      <button id="envelope" class="envelope" type="button" aria-label="Open your special wish">
+        <span class="flap"></span><span class="seal">🪔</span><span class="hint">Tap to open</span>
+      </button>
+      <article id="card" class="card">
+        <span class="corner tl">❖</span><span class="corner tr">❖</span><span class="corner bl">❖</span><span class="corner br">❖</span>
+        <div class="diyaWrap cardDiya" data-diya aria-hidden="true"></div>
+        <p class="ln salute" style="--n:0">Dear Family &amp; Friends,</p>
+        <p class="ln" style="--n:1">May this Diwali fill your home with happiness, your heart with peace, and your life with endless success.</p>
+        <p class="ln" style="--n:2">May every diya bring new hope, every sparkle bring a new smile, and every moment become a beautiful memory.</p>
+        <p class="ln hl" style="--n:3">Wishing You and Your Family a Very Happy Diwali!</p>
+        <p class="ln sign" style="--n:4">With Love &amp; Best Wishes ❤️</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="family" class="content" aria-label="Family wishes">
+    <div class="scrim"></div>
+    <h2 id="famHeading">✨ WITH LOVE &amp; BEST WISHES ✨</h2>
+    <div class="names">
+      <div class="nameRow"><h3 class="fname">NITIN KUMAR</h3><i class="rule"></i></div>
+      <div class="nameRow"><h3 class="fname">HEMLATA GUPTA</h3><i class="rule"></i></div>
+      <div class="nameRow"><h3 class="fname">DAKSH GUPTA</h3><i class="rule"></i></div>
+      <div class="nameRow"><h3 class="fname">LAKSHAY GUPTA</h3><i class="rule"></i></div>
+    </div>
+    <div id="signature">
+      <h2 class="sigText">🪔 WISHED BY GUPTA FAMILY 🪔</h2>
+      <div class="sigDiyas" id="sigDiyas" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <footer id="credit" class="content">
+    <div class="creditDiyas" id="creditDiyas" aria-hidden="true"></div>
+    <p id="creditText"><span class="split">Website Created by DAKSH GUPTA</span> <span class="heart">❤️</span></p>
+    <i class="creditLine"></i>
+  </footer>
+</main>
+
+<script>
+(() => {
+'use strict';
+
+/* ================= helpers ================= */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const rand  = (a, b) => a + Math.random() * (b - a);
+const pick  = a => a[Math.floor(Math.random() * a.length)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+let reduced = reduceMQ.matches;
+const onMQ = e => { reduced = e.matches; };
+if (reduceMQ.addEventListener) reduceMQ.addEventListener('change', onMQ); else if (reduceMQ.addListener) reduceMQ.addListener(onMQ);
+
+const S = { started:false, paused:false, run:0, famStarted:false, familyDone:false, creditDone:false, creditVisible:false,
+            wishOpened:false, introDone:false, lastUser:0 };
+const wait = async (id, ms) => { await sleep(ms); return id === S.run; };
+
+/* ================= audio (all synthesized, no files) ================= */
+const N = { C4:261.63, D4:293.66, E4:329.63, G4:392.0, A4:440.0, C5:523.25, D5:587.33, E5:659.25, G5:783.99 };
+const MEL = ['E4','G4','A4','G4','E4','D4','E4',0, 'G4','A4','C5','A4','G4','E4','G4',0,
+             'A4','C5','D5','E5','D5','C5','A4',0, 'G4','A4','G4','E4','D4','E4','C4',0].map(n => n ? N[n] : 0);
+const Snd = {
+  ctx:null, master:null, musicBus:null, sfxBus:null, delay:null, noise:null,
+  on:false, musicOn:true, sfxOn:true, timer:null, nextT:0, step:0, dur:60/94/2, voices:0, droneOn:false,
+  init(){
+    if (this.ctx) return true;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    try { this.ctx = new AC(); } catch (e) { return false; }
+    const c = this.ctx;
+    this.master = c.createGain(); this.master.gain.value = .9;
+    const comp = c.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 6;
+    this.master.connect(comp); comp.connect(c.destination);
+    this.musicBus = c.createGain(); this.musicBus.gain.value = this.musicOn ? .5 : 0; this.musicBus.connect(this.master);
+    this.sfxBus = c.createGain(); this.sfxBus.gain.value = this.sfxOn ? .85 : 0; this.sfxBus.connect(this.master);
+    this.delay = c.createDelay(1); this.delay.delayTime.value = .3;
+    const fb = c.createGain(); fb.gain.value = .32; const wet = c.createGain(); wet.gain.value = .35;
+    this.delay.connect(fb); fb.connect(this.delay); this.delay.connect(wet); wet.connect(this.musicBus);
+    const len = c.sampleRate * 2, b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    this.noise = b;
+    return true;
+  },
+  enable(){
+    if (!this.init()) return;
+    this.on = true;
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    this.startMusic();
+  },
+  disable(){ this.on = false; if (this.ctx) this.ctx.suspend(); },
+  setMusic(v){ this.musicOn = v; if (this.musicBus) this.musicBus.gain.setTargetAtTime(v ? .5 : 0, this.ctx.currentTime, .05); },
+  setSfx(v){ this.sfxOn = v; if (this.sfxBus) this.sfxBus.gain.setTargetAtTime(v ? .85 : 0, this.ctx.currentTime, .05); },
+  canSfx(){ return this.on && this.sfxOn && this.ctx; },
+  voice(sec){ if (this.voices >= 16) return false; this.voices++; setTimeout(() => this.voices--, sec * 1000); return true; },
+  out(node, pan){
+    const c = this.ctx;
+    if (c.createStereoPanner){ const p = c.createStereoPanner(); p.pan.value = clamp(pan || 0, -1, 1); node.connect(p); p.connect(this.sfxBus); }
+    else node.connect(this.sfxBus);
+  },
+  /* --- music --- */
+  startMusic(){
+    if (this.timer) return;
+    const c = this.ctx;
+    this.nextT = c.currentTime + .1; this.step = 0;
+    if (!this.droneOn){
+      this.droneOn = true;
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 320;
+      const g = c.createGain(); g.gain.value = .05; lp.connect(g); g.connect(this.musicBus);
+      [65.41, 98.0, 130.81].forEach(f => { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = rand(-6, 6); o.connect(lp); o.start(); });
+    }
+    this.timer = setInterval(() => this.pump(), 90);
+  },
+  pump(){
+    if (!this.on || !this.ctx) return;
+    const c = this.ctx;
+    while (this.nextT < c.currentTime + .35){ this.sched(this.step, this.nextT); this.nextT += this.dur; this.step++; }
+  },
+  sched(step, t){
+    const f = MEL[step % 32];
+    if (f) this.pluck(f, t, .9);
+    if (Math.floor(step / 32) % 2 === 1 && step % 4 === 2 && f) this.pluck(f * 2, t, .3);
+    const s = step % 8;
+    if (s === 0 || s === 5) this.thump(t, .9, 110);
+    if (s === 4) this.thump(t, .55, 150);
+    if (s === 3 || s === 7) this.tick(t, .4);
+    if (step % 32 === 0) this.chime(t);
+  },
+  pluck(freq, t, vel){
+    const c = this.ctx, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), lp = c.createBiquadFilter(), g2 = c.createGain();
+    o.type = 'triangle'; o.frequency.value = freq; o2.type = 'sine'; o2.frequency.value = freq * 2.005; g2.gain.value = .25;
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(3200, t); lp.frequency.exponentialRampToValueAtTime(900, t + .5);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.2 * vel, t + .01); g.gain.exponentialRampToValueAtTime(.0008, t + .9);
+    o.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.connect(this.musicBus); g.connect(this.delay);
+    o.start(t); o2.start(t); o.stop(t + 1); o2.stop(t + 1);
+  },
+  thump(t, vel, f0){
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(50, t + .18);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.32 * vel, t + .008); g.gain.exponentialRampToValueAtTime(.001, t + .26);
+    o.connect(g); g.connect(this.musicBus); o.start(t); o.stop(t + .3);
+  },
+  tick(t, vel){
+    const c = this.ctx, s = c.createBufferSource(), hp = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.noise; hp.type = 'highpass'; hp.frequency.value = 3500;
+    g.gain.setValueAtTime(.07 * vel, t); g.gain.exponentialRampToValueAtTime(.001, t + .05);
+    s.connect(hp); hp.connect(g); g.connect(this.musicBus); s.start(t, Math.random()); s.stop(t + .06);
+  },
+  chime(t){
+    const c = this.ctx;
+    [1318.5, 1975.5].forEach((f, i) => {
+      const o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.07 / (i + 1), t + .01); g.gain.exponentialRampToValueAtTime(.0005, t + 2.6);
+      o.connect(g); g.connect(this.musicBus); g.connect(this.delay); o.start(t); o.stop(t + 2.7);
+    });
+  },
+  /* --- sound effects --- */
+  launch(pan){
+    if (!this.canSfx() || !this.voice(1)) return;
+    const c = this.ctx, t = c.currentTime, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.noise; s.loop = true; f.type = 'bandpass'; f.Q.value = 1.1;
+    f.frequency.setValueAtTime(450, t); f.frequency.exponentialRampToValueAtTime(2800, t + .95);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.16, t + .2); g.gain.linearRampToValueAtTime(0, t + 1);
+    s.connect(f); f.connect(g); this.out(g, pan); s.start(t); s.stop(t + 1.05);
+  },
+  boom(size, pan){
+    if (!this.canSfx() || !this.voice(1.2)) return;
+    const c = this.ctx, t = c.currentTime + .02;
+    const s = c.createBufferSource(), lp = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = this.noise; lp.type = 'lowpass'; lp.frequency.setValueAtTime(2200, t); lp.frequency.exponentialRampToValueAtTime(160, t + 1);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.5 * size, t + .012); g.gain.exponentialRampToValueAtTime(.001, t + 1.1);
+    s.connect(lp); lp.connect(g); this.out(g, pan); s.start(t); s.stop(t + 1.2);
+    const o = c.createOscillator(), og = c.createGain(); o.type = 'sine';
+    o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(36, t + .5);
+    og.gain.setValueAtTime(.0001, t); og.gain.linearRampToValueAtTime(.55 * size, t + .01); og.gain.exponentialRampToValueAtTime(.001, t + .6);
+    o.connect(og); this.out(og, pan); o.start(t); o.stop(t + .65);
+    const n = Math.round(5 * size);
+    for (let i = 0; i < n; i++){
+      const tt = t + .15 + Math.random() * .9, cs = c.createBufferSource(), hp = c.createBiquadFilter(), cg = c.createGain();
+      cs.buffer = this.noise; hp.type = 'highpass'; hp.frequency.value = 3500 + Math.random() * 2500;
+      cg.gain.setValueAtTime(.09, tt); cg.gain.exponentialRampToValueAtTime(.001, tt + .05);
+      cs.connect(hp); hp.connect(cg); this.out(cg, (pan || 0) + Math.random() * .4 - .2); cs.start(tt, Math.random()); cs.stop(tt + .06);
+    }
+  },
+  bell(f = 1318.5, vol = .12, when = 0){
+    if (!this.canSfx()) return;
+    const c = this.ctx, t = c.currentTime + when;
+    [[1, 1], [2.01, .35], [3, .15]].forEach(([m, a]) => {
+      const o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.value = f * m;
+      g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(vol * a, t + .008); g.gain.exponentialRampToValueAtTime(.0005, t + 1.8);
+      o.connect(g); this.out(g, 0); o.start(t); o.stop(t + 1.9);
+    });
+  },
+  magic(){ [784, 987.8, 1174.7, 1568, 1975.5].forEach((f, i) => this.bell(f, .1, i * .1)); }
+};
+
+/* ================= ambient canvas: stars, gold dust, falling sparkles ================= */
+const AMB = {
+  cv:$('#ambient'), c:null, W:0, H:0, stars:[], dust:[], spark:[], rate:0, acc:0,
+  init(){ this.c = this.cv.getContext('2d'); this.resize(true); },
+  resize(force){
+    if (!force && Math.abs(innerWidth - this.W) < 1 && Math.abs(innerHeight - this.H) < 100) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.W = innerWidth; this.H = innerHeight;
+    this.cv.width = Math.round(this.W * dpr); this.cv.height = Math.round(this.H * dpr);
+    this.c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const ns = clamp(Math.round(this.W * this.H / 6500), 70, 240);
+    this.stars = Array.from({ length: ns }, () => ({ x:rand(0, this.W), y:rand(0, this.H), r:rand(.4, 1.5), p:rand(0, 6.28), s:rand(.6, 2.2), c:Math.random() < .35 ? '255,214,120' : '255,255,255' }));
+    const nd = clamp(Math.round(this.W / 14), 26, 90);
+    this.dust = Array.from({ length: nd }, () => this.newDust(true));
+    this.draw();
+  },
+  newDust(init){ return { x:rand(0, this.W), y:init ? rand(0, this.H) : this.H + 10, vy:rand(8, 26), sw:rand(6, 26), ph:rand(0, 6.28), sp:rand(.4, 1.2), r:rand(1, 2.8), a:rand(.3, .8) }; },
+  burst(n, scatter = true){
+    for (let i = 0; i < n; i++) this.spark.push({ x:rand(0, this.W), y:scatter ? rand(-40, this.H * .45) : -10, vx:rand(-14, 14), vy:rand(50, 150), life:rand(2, 4.5), r:rand(1, 2.6), ph:rand(0, 6.28) });
+    if (this.spark.length > 400) this.spark.splice(0, this.spark.length - 400);
+  },
+  step(dt){
+    if (reduced) dt = 0;
+    for (const s of this.stars) s.p += dt * s.s;
+    for (let i = 0; i < this.dust.length; i++){
+      const d = this.dust[i]; d.y -= d.vy * dt; d.ph += d.sp * dt; d.x += Math.sin(d.ph) * d.sw * dt;
+      if (d.y < -10) this.dust[i] = this.newDust(false);
+    }
+    for (let i = this.spark.length - 1; i >= 0; i--){
+      const p = this.spark[i]; p.life -= dt; p.y += p.vy * dt; p.x += p.vx * dt; p.ph += dt * 6;
+      if (p.life <= 0 || p.y > this.H + 10) this.spark.splice(i, 1);
+    }
+    if (this.rate > 0 && !reduced){ this.acc += dt * this.rate; while (this.acc >= 1){ this.acc--; this.burst(1, false); } }
+    this.draw();
+  },
+  draw(){
+    const c = this.c; c.clearRect(0, 0, this.W, this.H); c.globalCompositeOperation = 'lighter';
+    for (const s of this.stars){ c.fillStyle = `rgba(${s.c},${(.35 + .65 * (.5 + .5 * Math.sin(s.p))).toFixed(2)})`; c.beginPath(); c.arc(s.x, s.y, s.r, 0, 6.283); c.fill(); }
+    for (const d of this.dust){
+      const a = d.a * (.6 + .4 * Math.sin(d.ph));
+      c.fillStyle = `rgba(255,200,90,${(a * .16).toFixed(3)})`; c.beginPath(); c.arc(d.x, d.y, d.r * 4, 0, 6.283); c.fill();
+      c.fillStyle = `rgba(255,226,140,${a.toFixed(2)})`; c.beginPath(); c.arc(d.x, d.y, d.r, 0, 6.283); c.fill();
+    }
+    c.lineCap = 'round';
+    for (const p of this.spark){
+      const a = clamp(p.life, 0, 1) * (.6 + .4 * Math.sin(p.ph));
+      c.strokeStyle = `rgba(255,215,110,${(a * .7).toFixed(2)})`; c.lineWidth = p.r * .8;
+      c.beginPath(); c.moveTo(p.x - p.vx * .05, p.y - p.vy * .05); c.lineTo(p.x, p.y); c.stroke();
+    }
+    c.globalCompositeOperation = 'source-over';
+  }
+};
+
+/* ================= fireworks engine ================= */
+const HUES = [45, 28, 320, 280, 190, 130, 355, 210, 60];
+const TYPES = ['peony', 'ring', 'heart', 'willow', 'crackle', 'double', 'strobe'];
+const FW = {
+  cv:$('#fx'), c:null, W:0, H:0, k:1, quality:1, rockets:[], parts:[], flashes:[], autoOn:false, autoT:2, MAX:2400, dirty:false,
+  init(){ this.c = this.cv.getContext('2d'); this.resize(true); },
+  resize(force){
+    if (!force && Math.abs(innerWidth - this.W) < 1 && Math.abs(innerHeight - this.H) < 100) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, innerWidth < 700 ? 1.5 : 2);
+    this.W = innerWidth; this.H = innerHeight;
+    this.cv.width = Math.round(this.W * dpr); this.cv.height = Math.round(this.H * dpr);
+    this.c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.k = clamp(Math.min(this.W, this.H * .9) / 600, .72, 1.3);
+  },
+  launch(o = {}){
+    if (reduced && this.rockets.length > 3) return;
+    const tx = o.x ?? rand(.08, .92) * this.W, ty = o.ty ?? rand(.12, .5) * this.H;
+    const x0 = tx + rand(-50, 50), y0 = this.H + 10, h1 = o.h ?? pick(HUES);
+    this.rockets.push({ x0, y0, tx, ty, x:x0, y:y0, t:0, dur:rand(.8, 1.15) * (.55 + .45 * ((y0 - ty) / this.H)),
+      delay:o.delay || 0, type:o.type || pick(TYPES), h1, h2:o.h2 ?? ((h1 + rand(40, 180)) % 360), big:!!o.big, ph:rand(0, 6.28), acc:0, snd:false });
+    this.dirty = true;
+  },
+  volley(n, gap = .25, o = {}){
+    n = reduced ? Math.min(n, 2) : n;
+    for (let i = 0; i < n; i++) this.launch({ ...o, delay:(o.delay || 0) + i * gap + rand(0, gap * .6) });
+  },
+  finale(){
+    const n = reduced ? 4 : Math.round(34 * Math.min(1, this.quality + .2)), dur = 7.5;
+    for (let i = 0; i < n; i++) this.launch({ delay:i * (dur / n) + rand(0, .15), type:pick(TYPES), x:rand(.06, .94) * this.W, ty:rand(.1, .5) * this.H, big:Math.random() < .35 });
+    const end = dur + .4, walls = reduced ? 2 : 7;
+    for (let j = 0; j < walls; j++) this.launch({ delay:end + j * .07, x:(j + .5) / walls * this.W, ty:rand(.14, .32) * this.H, type:'willow', h:42, big:true });
+    this.launch({ delay:end + .6, x:this.W / 2, ty:this.H * .3, type:'double', big:true, h:45, h2:300 });
+  },
+  explode(x, y, type, h1, h2, big){
+    const k = this.k * (big ? 1.25 : 1) * rand(.9, 1.12), q = this.quality * (reduced ? .5 : 1), S0 = 300 * k;
+    this.flashes.push({ x, y, r:rand(130, 210) * k, life:.4, max:.4, h:h1 });
+    Snd.boom(big ? 1.4 : 1, (x / this.W - .5) * 1.6);
+    const addV = (vx, vy, o) => {
+      if (this.parts.length >= this.MAX) return;
+      const life = o.life ?? rand(1.2, 1.9);
+      this.parts.push({ x, y, vx, vy, life, max:life, size:o.size ?? rand(1.5, 2.5) * Math.min(k, 1.15), col:o.col, grav:o.grav ?? 90 * k, drag:o.drag ?? .2, tw:!!o.tw, ph:rand(0, 6.28), cr:!!o.cr });
+    };
+    const col = (h, l = 62, s = 100) => `hsl(${Math.round((h + 360) % 360)},${s}%,${l}%)`;
+    const cnt = n => Math.max(8, Math.round(n * q));
+    const peony = (n, sp, h, o = {}) => { for (let i = 0; i < n; i++){ const a = rand(0, 6.283), s = sp * (.3 + .7 * Math.sqrt(Math.random())); addV(Math.cos(a) * s, Math.sin(a) * s, { ...o, col:col(h + rand(-10, 10), o.l ?? rand(58, 72)) }); } };
+    const ring = (n, sp, h) => { const tilt = rand(.35, 1), rot = rand(0, 6.283), cr = Math.cos(rot), sr = Math.sin(rot);
+      for (let i = 0; i < n; i++){ const a = i / n * 6.283, vx0 = Math.cos(a) * sp, vy0 = Math.sin(a) * sp * tilt; addV(vx0 * cr - vy0 * sr, vx0 * sr + vy0 * cr, { col:col(h, 64), life:rand(1.3, 1.7), size:2.2 }); } };
+    switch (type){
+      case 'ring':    ring(cnt(76), S0 * .95, h1); break;
+      case 'heart': {
+        const n = cnt(90), sc = S0 / 16 * .95;
+        for (let i = 0; i < n; i++){ const t = i / n * 6.283, hx = 16 * Math.pow(Math.sin(t), 3), hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+          addV(hx * sc, hy * sc, { col:col(345, 64), life:rand(1.4, 1.8), size:2.3 }); }
+        peony(cnt(14), S0 * .3, 40, { life:1.1 }); break; }
+      case 'willow':  for (let i = 0; i < cnt(80); i++){ const a = rand(0, 6.283), s = S0 * rand(.35, .85); addV(Math.cos(a) * s, Math.sin(a) * s, { col:col(42, 70, 95), life:rand(2.6, 3.6), grav:55 * k, drag:.35, size:1.7, tw:true }); } break;
+      case 'crackle': peony(cnt(100), S0, h1, { cr:true, life:rand(1.1, 1.6) }); break;
+      case 'strobe':  peony(cnt(100), S0, h1, { tw:true, l:80 }); break;
+      case 'double':  ring(cnt(46), S0 * .55, h2); peony(cnt(90), S0, h1); break;
+      default:        peony(cnt(120), S0, h1);
+    }
+    this.dirty = true;
+  },
+  step(dt){
+    if (this.autoOn && !reduced){
+      this.autoT -= dt;
+      if (this.autoT <= 0){ this.autoT = rand(2.4, 4.8); this.launch({ x:rand(.1, .9) * this.W }); if (Math.random() < .3) this.launch({ delay:.35 }); }
+    }
+    const R = this.rockets;
+    for (let i = R.length - 1; i >= 0; i--){
+      const r = R[i];
+      if (r.delay > 0){ r.delay -= dt; continue; }
+      if (!r.snd){ r.snd = true; Snd.launch((r.tx / this.W - .5) * 1.6); }
+      r.t += dt / r.dur;
+      const t = Math.min(1, r.t), e = 1 - (1 - t) * (1 - t);
+      r.x = r.x0 + (r.tx - r.x0) * e + Math.sin(t * 18 + r.ph) * 2; r.y = r.y0 + (r.ty - r.y0) * e;
+      r.acc += dt;
+      while (r.acc > .012){ r.acc -= .012;
+        if (this.parts.length < this.MAX) this.parts.push({ x:r.x, y:r.y, vx:rand(-12, 12), vy:rand(10, 40), life:.5, max:.5, size:1.3, col:'#ffcf7a', grav:40, drag:.08, tw:false, ph:0, cr:false }); }
+      if (r.t >= 1){ this.explode(r.x, r.y, r.type, r.h1, r.h2, r.big); R.splice(i, 1); }
+    }
+    const P = this.parts;
+    for (let i = P.length - 1; i >= 0; i--){
+      const p = P[i]; p.life -= dt;
+      if (p.life <= 0){
+        if (p.cr){ for (let j = 0; j < 2; j++) P.push({ x:p.x, y:p.y, vx:rand(-70, 70), vy:rand(-70, 70), life:.35, max:.35, size:1.4, col:'#fff7dc', grav:0, drag:.1, tw:true, ph:rand(0, 6), cr:false }); }
+        P[i] = P[P.length - 1]; P.pop(); continue;
+      }
+      const d = Math.pow(p.drag, dt);
+      p.vx *= d; p.vy = p.vy * d + p.grav * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+    }
+    const F = this.flashes;
+    for (let i = F.length - 1; i >= 0; i--){ F[i].life -= dt; if (F[i].life <= 0) F.splice(i, 1); }
+    if (R.length || P.length || F.length){ this.draw(); this.dirty = true; }
+    else if (this.dirty){ this.c.clearRect(0, 0, this.W, this.H); this.dirty = false; }
+  },
+  draw(){
+    const c = this.c; c.clearRect(0, 0, this.W, this.H); c.globalCompositeOperation = 'lighter'; c.lineCap = 'round';
+    for (const f of this.flashes){
+      const a = f.life / f.max, g = c.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r);
+      g.addColorStop(0, `hsla(${f.h},100%,80%,${(.32 * a).toFixed(3)})`); g.addColorStop(1, `hsla(${f.h},100%,55%,0)`);
+      c.globalAlpha = 1; c.fillStyle = g; c.fillRect(f.x - f.r, f.y - f.r, f.r * 2, f.r * 2);
+    }
+    for (const r of this.rockets){
+      if (r.delay > 0) continue;
+      c.globalAlpha = 1; c.fillStyle = 'rgba(255,180,60,.35)'; c.beginPath(); c.arc(r.x, r.y, 6, 0, 6.283); c.fill();
+      c.fillStyle = '#fff6d0'; c.beginPath(); c.arc(r.x, r.y, 2.2, 0, 6.283); c.fill();
+    }
+    for (const p of this.parts){
+      let a = Math.min(1, p.life / p.max * 1.6);
+      if (p.tw) a *= .55 + .45 * Math.sin(p.life * 42 + p.ph);
+      c.globalAlpha = a > 0 ? a : 0; c.strokeStyle = p.col; c.lineWidth = p.size;
+      c.beginPath(); c.moveTo(p.x - p.vx * .03, p.y - p.vy * .03); c.lineTo(p.x, p.y); c.stroke();
+    }
+    c.globalAlpha = 1; c.globalCompositeOperation = 'source-over';
+  }
+};
+
+/* ================= scene builders ================= */
+const globalDefsOK = true;
+function diyaSVG(){
+  const d1 = (.7 + Math.random() * .6).toFixed(2), d2 = (Math.random() * 1.5).toFixed(2);
+  return `<svg viewBox="0 0 200 150" aria-hidden="true"><ellipse cx="100" cy="132" rx="70" ry="10" fill="rgba(0,0,0,.35)"/>
+<path d="M18 66 C30 66 40 68 52 68 L148 68 C160 68 170 66 182 66 C178 100 150 124 100 124 C50 124 22 100 18 66 Z" fill="url(#gBowl)"/>
+<path d="M18 66 C30 66 40 68 52 68 L148 68 C160 68 170 66 182 66" fill="none" stroke="#ffe08a" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="100" cy="67" rx="62" ry="7" fill="#7a2f08"/><ellipse cx="100" cy="66" rx="54" ry="5" fill="url(#gOil)"/>
+<path d="M40 86 Q100 106 160 86" fill="none" stroke="#ffd77a" stroke-width="2.5" opacity=".8"/>
+<circle cx="62" cy="98" r="3.2" fill="#ffe08a"/><circle cx="100" cy="109" r="3.2" fill="#ffe08a"/><circle cx="138" cy="98" r="3.2" fill="#ffe08a"/>
+<rect x="97" y="52" width="6" height="16" rx="2.5" fill="#2a1308"/>
+<g class="flameWrap"><g class="flame" style="animation-duration:${d1}s;animation-delay:-${d2}s">
+<path d="M100 4 C108 24 128 36 121 51 C117 61 109 64 100 64 C91 64 83 61 79 51 C72 36 92 24 100 4Z" fill="url(#gFlame)"/>
+<path d="M100 28 C106 38 113 47 108 56 C106 62 94 62 92 56 C87 47 94 38 100 28Z" fill="url(#gCore)"/></g></g></svg>`;
+}
+function fillDiyas(root = document){ $$('[data-diya]', root).forEach(el => { if (!el.firstChild) el.innerHTML = diyaSVG(); }); }
+function makeDiyas(container, n){
+  container.innerHTML = '';
+  for (let i = 0; i < n; i++){ const d = document.createElement('div'); d.className = 'diyaWrap'; d.setAttribute('data-diya', ''); container.appendChild(d); }
+  fillDiyas(container);
+}
+function lightDiyas(root){
+  const list = root.matches && root.matches('.diyaWrap') ? [root] : $$('.diyaWrap', root);
+  list.forEach((d, i) => setTimeout(() => d.classList.add('lit'), reduced ? 0 : i * 180));
+}
+function splitLetters(el){
+  const text = el.textContent.trim(); el.textContent = ''; let idx = 0;
+  text.split(' ').forEach((w, wi, arr) => {
+    const word = document.createElement('span'); word.className = 'w'; word.setAttribute('aria-hidden', 'true');
+    for (const ch of w){ const s = document.createElement('span'); s.className = 'l'; s.style.setProperty('--i', idx++); s.textContent = ch; word.appendChild(s); }
+    el.appendChild(word); if (wi < arr.length - 1) el.appendChild(document.createTextNode(' '));
+  });
+}
+function buildGarland(){
+  const g = $('#garland'); g.innerHTML = ''; const w = g.clientWidth || innerWidth, sag = 32;
+  const n = Math.max(2, Math.round(w / 200)), sw = w / n, per = Math.max(5, Math.round(sw / 26));
+  const colors = ['#ffcf4a', '#ff7a2a', '#ff4fa0', '#b66bff', '#4de0ff'];
+  let d = '';
+  for (let s = 0; s < n; s++) d += `M${(s * sw).toFixed(1)},0 Q${((s + .5) * sw).toFixed(1)},${sag * 2} ${((s + 1) * sw).toFixed(1)},0 `;
+  g.insertAdjacentHTML('beforeend', `<svg width="${w}" height="${sag + 6}" viewBox="0 0 ${w} ${sag + 6}"><path d="${d}" fill="none" stroke="rgba(255,210,120,.45)" stroke-width="1.6"/></svg>`);
+  let k = 0;
+  for (let s = 0; s < n; s++) for (let i = 1; i < per; i++){
+    const t = i / per, b = document.createElement('i'); b.className = 'bulb';
+    b.style.left = ((s + t) * sw).toFixed(1) + 'px'; b.style.top = (4 * sag * t * (1 - t)).toFixed(1) + 'px';
+    b.style.setProperty('--c', colors[k % colors.length]); b.style.setProperty('--d', (-(k % 7) * .25).toFixed(2) + 's'); k++; g.appendChild(b);
+  }
+}
+function buildPalace(){
+  const crn = (x0, x1, y, step = 26, w = 14, h = 10) => { let s = ''; for (let x = x0; x < x1; x += step) s += `<rect x="${x}" y="${y}" width="${w}" height="${h}"/>`; return s; };
+  const chh = (cx, yb, sc) => `<rect x="${cx - 24 * sc}" y="${yb - 52 * sc}" width="${48 * sc}" height="${52 * sc}"/><path d="M${cx - 28 * sc} ${yb - 52 * sc} C${cx - 28 * sc} ${yb - 78 * sc} ${cx - 10 * sc} ${yb - 88 * sc} ${cx} ${yb - 104 * sc} C${cx + 10 * sc} ${yb - 88 * sc} ${cx + 28 * sc} ${yb - 78 * sc} ${cx + 28 * sc} ${yb - 52 * sc}Z"/><rect x="${cx - 2 * sc}" y="${yb - 122 * sc}" width="${4 * sc}" height="${20 * sc}"/>`;
+  const minaret = cx => `<rect x="${cx - 12}" y="96" width="24" height="224"/><rect x="${cx - 19}" y="140" width="38" height="7"/><rect x="${cx - 19}" y="200" width="38" height="7"/><path d="M${cx - 17} 96 C${cx - 17} 76 ${cx - 5} 70 ${cx} 52 C${cx + 5} 70 ${cx + 17} 76 ${cx + 17} 96Z"/><rect x="${cx - 1.5}" y="30" width="3" height="24"/>`;
+  let near = `<svg viewBox="0 0 1600 320" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="palG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241250"/><stop offset="1" stop-color="#07031c"/></linearGradient><linearGradient id="gateG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd36a"/><stop offset="1" stop-color="#ff8a1f"/></linearGradient></defs><g fill="url(#palG)">`;
+  near += `<rect x="0" y="262" width="1600" height="58"/>` + crn(0, 1600, 252, 28, 16, 12);
+  near += `<rect x="300" y="205" width="270" height="115"/><rect x="1030" y="205" width="270" height="115"/>` + crn(300, 570, 195, 24) + crn(1030, 1300, 195, 24);
+  near += `<rect x="560" y="165" width="480" height="155"/>` + crn(560, 1040, 155);
+  near += `<rect x="730" y="128" width="140" height="42"/><path d="M722 130 C722 80 765 54 800 34 C835 54 878 80 878 130Z"/><rect x="797" y="8" width="6" height="28"/><circle cx="800" cy="8" r="6"/>`;
+  near += chh(620, 170, 1) + chh(980, 170, 1) + chh(400, 210, .9) + chh(1200, 210, .9) + chh(170, 262, .75) + chh(1430, 262, .75);
+  near += minaret(520) + minaret(1080) + `</g>`;
+  near += `<path class="gate" d="M768 320 V262 a32 32 0 0 1 64 0 V320Z" fill="url(#gateG)"/><g class="wins" fill="#ffc94d">`;
+  const win = (x, yb, h = 18) => `<path style="animation-delay:${(Math.random() * 4).toFixed(2)}s" d="M${x} ${yb} v-${h} a8 8 0 0 1 16 0 v${h}z"/>`;
+  [590, 632, 674, 716, 884, 926, 968, 1010].forEach(x => near += win(x, 232, 20));
+  for (let x = 322; x <= 530; x += 36){ near += win(x, 252, 18) + win(x, 300, 16); }
+  for (let x = 1050; x <= 1260; x += 36){ near += win(x, 252, 18) + win(x, 300, 16); }
+  [520, 1080].forEach(cx => near += `<rect style="animation-delay:${(Math.random() * 4).toFixed(2)}s" x="${cx - 4}" y="112" width="8" height="14"/>`);
+  near += `</g></svg>`;
+  $('#palaceNear').innerHTML = near;
+  let seed = 7; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let far = `<svg viewBox="0 0 1600 320" preserveAspectRatio="xMidYMax slice"><g fill="#2a1763">`;
+  for (let x = 20; x < 1600; x += r() * 70 + 90){
+    const w = 40 + r() * 40, h = 90 + r() * 120, y = 320 - h, cx = x + w / 2;
+    far += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}"/><path d="M${(x - 4).toFixed(1)} ${y.toFixed(1)} C${(x - 4).toFixed(1)} ${(y - 24).toFixed(1)} ${(cx - 10).toFixed(1)} ${(y - 34).toFixed(1)} ${cx.toFixed(1)} ${(y - 54).toFixed(1)} C${(cx + 10).toFixed(1)} ${(y - 34).toFixed(1)} ${(x + w + 4).toFixed(1)} ${(y - 24).toFixed(1)} ${(x + w + 4).toFixed(1)} ${y.toFixed(1)}Z"/><rect x="${(cx - 1.5).toFixed(1)}" y="${(y - 72).toFixed(1)}" width="3" height="20"/>`;
+  }
+  far += `</g></svg>`;
+  $('#palaceFar').innerHTML = far;
+  setPalaceRatio();
+}
+function setPalaceRatio(){
+  $$('.palace').forEach(p => { const svg = $('svg', p); if (!svg) return; const ratio = p.clientWidth / Math.max(1, p.clientHeight);
+    svg.setAttribute('preserveAspectRatio', ratio > 5.2 ? 'xMidYMax meet' : 'xMidYMax slice'); });
+}
+function buildRangoli(){
+  const cols = ['#ff4d6d', '#ffb000', '#ff7a00', '#9b5de5', '#00c2d1', '#ff5fa2', '#ffd25a'];
+  let s = `<circle cx="200" cy="200" r="197" fill="rgba(20,8,60,.55)"/><circle cx="200" cy="200" r="190" fill="none" stroke="#ffd25a" stroke-width="3"/><circle cx="200" cy="200" r="181" fill="none" stroke="#fff3d6" stroke-width="4" stroke-dasharray="1 9" stroke-linecap="round"/>`;
+  for (let i = 0; i < 16; i++) s += `<path d="M200 22 C222 52 222 82 200 108 C178 82 178 52 200 22Z" fill="${cols[i % cols.length]}" stroke="rgba(255,255,255,.55)" stroke-width="1.4" transform="rotate(${i * 22.5} 200 200)"/>`;
+  for (let i = 0; i < 16; i++) s += `<circle cx="200" cy="28" r="3.2" fill="#fff3d6" transform="rotate(${i * 22.5 + 11.25} 200 200)"/>`;
+  for (let i = 0; i < 24; i++) s += `<circle cx="200" cy="70" r="2.6" fill="${cols[(i + 3) % cols.length]}" transform="rotate(${i * 15} 200 200)"/>`;
+  for (let i = 0; i < 12; i++) s += `<path d="M200 84 C216 104 216 124 200 144 C184 124 184 104 200 84Z" fill="${cols[(i + 2) % cols.length]}" stroke="rgba(255,255,255,.5)" stroke-width="1.2" transform="rotate(${i * 30 + 15} 200 200)"/>`;
+  for (let i = 0; i < 8; i++) s += `<path d="M200 126 C210 138 210 150 200 164 C190 150 190 138 200 126Z" fill="${cols[(i + 5) % cols.length]}" stroke="rgba(255,255,255,.5)" stroke-width="1" transform="rotate(${i * 45} 200 200)"/>`;
+  s += `<circle cx="200" cy="200" r="26" fill="#ffd25a"/><circle cx="200" cy="200" r="17" fill="#ff7a00"/><circle cx="200" cy="200" r="9" fill="#fff3d6"/><circle cx="200" cy="200" r="4" fill="#9b5de5"/>`;
+  $$('.rangoli svg').forEach(svg => svg.innerHTML = s);
+}
+const lanternLayer = $('#lanterns');
+function makeLantern(o = {}){
+  const el = document.createElement('div'), size = o.size || rand(26, 52), dur = o.dur || rand(16, 30);
+  el.className = 'lantern' + (o.temp ? ' once' : '');
+  el.style.cssText = `--x:${o.x ?? rand(2, 94)}%;--s:${size.toFixed(0)}px;--dur:${dur.toFixed(1)}s;--del:${(-rand(0, dur)).toFixed(1)}s;--sway:${rand(-40, 40).toFixed(0)}px;--hue:${pick([28, 38, 18, 330, 280])};--ty:${rand(12, 80).toFixed(0)}vh`;
+  el.innerHTML = '<i></i>'; lanternLayer.appendChild(el);
+  if (o.temp) el.addEventListener('animationend', () => el.remove());
+}
+let ambientLanterns = false;
+function startAmbientLanterns(){
+  if (ambientLanterns) return; ambientLanterns = true;
+  const n = innerWidth < 700 ? 5 : 8;
+  for (let i = 0; i < n; i++) makeLantern();
+}
+function fitNames(){
+  const els = $$('.fname'); els.forEach(e => e.style.fontSize = ''); let min = Infinity;
+  els.forEach(el => {
+    let fs = parseFloat(getComputedStyle(el).fontSize), n = 0;
+    while (el.scrollWidth > el.clientWidth + 1 && n++ < 60){ fs *= .96; el.style.fontSize = fs + 'px'; }
+    min = Math.min(min, fs);
+  });
+  els.forEach(e => e.style.fontSize = min + 'px');
+}
+
+/* ================= story / sequences ================= */
+function resetAll(){
+  const B = document.body;
+  B.classList.remove('i-diya', 'i-light', 'i-title', 'i-ui', 'magic');
+  $$('.lit').forEach(e => e.classList.remove('lit'));
+  $$('.show,.active').forEach(e => e.classList.remove('show', 'active'));
+  $('#wishWrap').classList.remove('open');
+  S.famStarted = false; S.familyDone = false; S.creditDone = false; S.wishOpened = false; S.introDone = false;
+  FW.autoOn = false; AMB.rate = 0;
+}
+async function playIntro(){
+  const id = ++S.run, B = document.body;
+  resetAll();
+  if (!await wait(id, 350)) return;
+  B.classList.add('i-diya');
+  if (!await wait(id, 700)) return;
+  lightDiyas($('#mainDiya')); Snd.bell(880, .09);
+  if (!await wait(id, 1100)) return;
+  B.classList.add('i-light'); AMB.burst(reduced ? 10 : 40);
+  if (!await wait(id, 2300)) return;
+  B.classList.add('i-title'); Snd.magic();
+  if (!await wait(id, 1500)) return;
+  FW.volley(8, .34); FW.launch({ x:innerWidth / 2, ty:innerHeight * .24, type:'double', big:true, h:45, h2:320, delay:2.8 });
+  if (!await wait(id, 1500)) return;
+  B.classList.add('i-ui'); lightDiyas($('#diyaRow')); startAmbientLanterns();
+  AMB.rate = 5; FW.autoOn = true; S.introDone = true;
+}
+function unpause(){ if (S.paused) setPaused(false); }
+function magic(){
+  unpause();
+  const B = document.body; B.classList.remove('magic'); void B.offsetWidth; B.classList.add('magic'); setTimeout(() => B.classList.remove('magic'), 2600);
+  AMB.burst(reduced ? 20 : 140);
+  for (let i = 0; i < (reduced ? 3 : 10); i++) makeLantern({ temp:true, x:rand(4, 94), size:rand(30, 56), dur:rand(7, 12) });
+  FW.volley(4, .28);
+  $$('.diyaWrap').forEach(d => { d.classList.remove('flare'); void d.offsetWidth; d.classList.add('flare'); setTimeout(() => d.classList.remove('flare'), 1600); });
+  Snd.magic();
+}
+function bigFireworks(){
+  unpause();
+  FW.volley(12, .2);
+  FW.launch({ x:innerWidth / 2, ty:innerHeight * .28, type:'double', delay:2.4, big:true, h:45, h2:300 });
+  FW.launch({ x:innerWidth * .22, ty:innerHeight * .3, type:'heart', delay:3, big:true });
+  FW.launch({ x:innerWidth * .78, ty:innerHeight * .3, type:'willow', delay:3.2, big:true, h:42 });
+}
+function openWish(){
+  if (S.wishOpened) return; S.wishOpened = true;
+  $('#wishWrap').classList.add('open'); setTimeout(() => lightDiyas($('#card')), 900);
+  Snd.magic(); FW.volley(4, .25); AMB.burst(reduced ? 8 : 50);
+}
+function goWish(){
+  unpause();
+  $('#wish').scrollIntoView({ behavior:reduced ? 'auto' : 'smooth', block:'center' });
+  setTimeout(openWish, reduced ? 0 : 700);
+}
+function celebrateAgain(){
+  unpause(); window.scrollTo({ top:0, behavior:'auto' });
+  S.run++; resetAll(); playIntro();
+}
+function celebrateAt(row, i){
+  const r = row.getBoundingClientRect(), cy = clamp(r.top + r.height / 2, 80, innerHeight - 80), side = i % 2 ? .82 : .18;
+  FW.launch({ x:innerWidth * side, ty:clamp(cy - rand(40, 110), 70, innerHeight * .55), type:pick(['peony', 'ring', 'crackle', 'strobe', 'heart']) });
+  FW.launch({ x:innerWidth * (1 - side), ty:clamp(cy + rand(-80, 40), 90, innerHeight * .7), type:pick(['peony', 'double', 'strobe', 'ring']), delay:.3 });
+  if (i === 3) FW.volley(5, .25, { delay:.6 });
+  Snd.bell(1046.5 + i * 130, .12);
+}
+async function runFamily(){
+  if (S.famStarted) return; S.famStarted = true; const id = S.run;
+  $('#famHeading').classList.add('show'); Snd.magic(); FW.volley(3, .3);
+  if (!await wait(id, 1900)) return;
+  const rows = $$('.nameRow');
+  for (let i = 0; i < rows.length; i++){
+    rows.forEach(r => r.classList.remove('active')); rows[i].classList.add('show', 'active');
+    celebrateAt(rows[i], i);
+    if (!await wait(id, 3300)) return;
+  }
+  rows.forEach(r => r.classList.remove('active'));
+  if (!await wait(id, 500)) return;
+  const sig = $('#signature'); sig.classList.add('show'); lightDiyas($('#sigDiyas'));
+  FW.volley(9, .22, { big:true }); Snd.magic(); AMB.burst(reduced ? 10 : 60);
+  if (!await wait(id, 1500)) return;
+  S.familyDone = true; maybeCredit();
+  if (!await wait(id, 2500)) return;
+  if (!S.creditDone && Date.now() - S.lastUser > 2500)
+    $('#creditText').scrollIntoView({ behavior:reduced ? 'auto' : 'smooth', block:'center' });
+}
+function maybeCredit(){ if (S.creditVisible && S.familyDone && !S.creditDone) revealCredit(); }
+async function revealCredit(){
+  S.creditDone = true; const id = S.run;
+  $('#credit').classList.add('show'); lightDiyas($('#creditDiyas')); Snd.magic();
+  if (!await wait(id, 2200)) return;
+  FW.finale(); Snd.bell(1568, .12); AMB.burst(reduced ? 10 : 80);
+}
+
+/* ================= controls ================= */
+function syncSound(){
+  const on = Snd.on, bs = $('#btnSound');
+  bs.textContent = on ? '🔊 SOUND ON' : '🔇 SOUND OFF'; bs.setAttribute('aria-pressed', String(on));
+  $('#ctlSound').textContent = on ? '🔊' : '🔇'; $('#ctlSound').classList.toggle('off', !on);
+  $('#ctlMusic').classList.toggle('off', !Snd.musicOn); $('#ctlSfx').classList.toggle('off', !Snd.sfxOn);
+}
+function toggleSound(){ if (Snd.on) Snd.disable(); else Snd.enable(); syncSound(); }
+function setPaused(v){
+  S.paused = v; document.body.classList.toggle('paused', v);
+  const b = $('#ctlPause'); b.textContent = v ? '▶' : '⏸'; b.setAttribute('aria-label', v ? 'Resume animations' : 'Pause animations');
+}
+function begin(withSound){
+  if (S.started) return; S.started = true;
+  document.body.classList.add('started');
+  if (withSound) Snd.enable();
+  syncSound(); playIntro();
+}
+
+$('#beginSound').addEventListener('click', () => begin(true));
+$('#beginSilent').addEventListener('click', () => begin(false));
+$('#btnMagic').addEventListener('click', magic);
+$('#btnFire').addEventListener('click', bigFireworks);
+$('#btnWish').addEventListener('click', goWish);
+$('#btnSound').addEventListener('click', toggleSound);
+$('#btnAgain').addEventListener('click', celebrateAgain);
+$('#envelope').addEventListener('click', openWish);
+$('#ctlSound').addEventListener('click', toggleSound);
+$('#ctlMusic').addEventListener('click', () => { if (!Snd.ctx && !Snd.init()) return; Snd.setMusic(!Snd.musicOn); syncSound(); });
+$('#ctlSfx').addEventListener('click', () => { if (!Snd.ctx && !Snd.init()) return; Snd.setSfx(!Snd.sfxOn); syncSound(); });
+$('#ctlPause').addEventListener('click', () => setPaused(!S.paused));
+
+['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(ev => addEventListener(ev, () => { S.lastUser = Date.now(); }, { passive:true }));
+addEventListener('scroll', () => document.body.classList.toggle('away', scrollY > innerHeight * .5), { passive:true });
+document.addEventListener('visibilitychange', () => {
+  if (!Snd.ctx) return;
+  if (document.hidden) Snd.ctx.suspend(); else if (Snd.on) Snd.ctx.resume();
+});
+
+const watch = (el, th, cb) => new IntersectionObserver(es => es.forEach(cb), { threshold:th }).observe(el);
+watch($('#wish'), .5, e => { if (e.isIntersecting && S.started) setTimeout(() => { if (S.started) openWish(); }, reduced ? 200 : 900); });
+watch($('#family'), .3, e => { if (e.isIntersecting && S.started) runFamily(); });
+watch($('#creditText'), .6, e => { S.creditVisible = e.isIntersecting; if (e.isIntersecting) maybeCredit(); });
+
+let rt;
+addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
+  AMB.resize(); FW.resize(); buildGarland(); setPalaceRatio(); fitNames(); }, 150); });
+addEventListener('orientationchange', () => setTimeout(() => { AMB.resize(true); FW.resize(true); buildGarland(); setPalaceRatio(); fitNames(); }, 300));
+
+/* ================= init ================= */
+splitLetters($('#title'));
+splitLetters($('#creditText .split'));
+makeDiyas($('#diyaRow'), 6);
+makeDiyas($('#sigDiyas'), 5);
+makeDiyas($('#creditDiyas'), 5);
+fillDiyas();
+buildPalace(); buildRangoli(); buildGarland();
+AMB.init(); FW.init();
+fitNames();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNames);
+addEventListener('load', () => { fitNames(); buildGarland(); setPalaceRatio(); });
+
+/* ================= main loop with parallax ================= */
+const ptr = { x:0, y:0 }, sm = { x:0, y:0 };
+addEventListener('pointermove', e => { ptr.x = (e.clientX / innerWidth - .5) * 2; ptr.y = (e.clientY / innerHeight - .5) * 2; }, { passive:true });
+const farEl = $('#palaceFar'), nearEl = $('#palaceNear');
+let last = performance.now(), dtAvg = .016, frames = 0;
+function loop(now){
+  requestAnimationFrame(loop);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (S.paused || document.hidden) return;
+  dtAvg = dtAvg * .95 + dt * .05; frames++;
+  if (frames === 150 && dtAvg > .026) FW.quality = .6;
+  if (!reduced){
+    sm.x += (ptr.x - sm.x) * .06; sm.y += (ptr.y - sm.y) * .06;
+    const sy = window.scrollY;
+    if (sy < innerHeight * 1.5){
+      farEl.style.transform = `translate3d(${(-sm.x * 8).toFixed(1)}px,${(-sm.y * 3 + sy * .08).toFixed(1)}px,0)`;
+      nearEl.style.transform = `translate3d(${(-sm.x * 18).toFixed(1)}px,${(-sm.y * 6 + sy * .16).toFixed(1)}px,0)`;
+    }
+  }
+  AMB.step(dt); FW.step(dt);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
